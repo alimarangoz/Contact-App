@@ -7,32 +7,32 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.alimarangoz.contactapp.adapters.ContactAdapter
 import com.alimarangoz.contactapp.databinding.FragmentSlideshowBinding
 
 class WorkFragment : Fragment() {
 
     private var _binding: FragmentSlideshowBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
+
     private val binding get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val workViewModel =
-            ViewModelProvider(this)[WorkViewModel::class.java]
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        _binding = FragmentSlideshowBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        val recyclerView: RecyclerView = binding.recyclerView
+        val adapter = ContactAdapter()
 
-        val textView: TextView = binding.textSlideshow
-        workViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = adapter
+
+        val workViewModel = ViewModelProvider(this)[WorkViewModel::class.java]
+
+        workViewModel.getAllContacts().observe(viewLifecycleOwner) { contacts ->
+            adapter.submitList(contacts)
         }
-        return root
     }
 
     override fun onDestroyView() {
